@@ -1,54 +1,5 @@
-
-Banc de Recursos
-millorar el sistema del banc de recusos, tant el outlook de l'empresa/treballadors com la web per a clients i control d'inventari
-
-Claude Fable 5 no está disponible en este momento.
-Más información(opens in new tab)
-
-
-¿Cómo puedo ayudarle hoy?
-
-
-Actualitzacions gestió serveis i torns Vercel
-Último mensaje hace 4 horas
-Redisseny del Banc de recursos amb control d'inventari
-Último mensaje hace 18 horas
-Tecnologies i serveis online del projecte
-Último mensaje ayer
-Project brief for Grok
-Último mensaje ayer
-Demostración de capacidades con Claude para proyecto web
-Último mensaje ayer
-Preparació reunió IT per app i web
-Último mensaje hace 4 días
-Sistema de gestión de inventario y pedidos para empresa de alquiler
-Último mensaje 30 may
-Propuesta de mejoras informáticas para la oficina
-Último mensaje 30 may
-Acceso al archivo de horarios compartido
-Último mensaje 30 may
-Problemes tècnics web banc de recursos
-Último mensaje 30 may
-Memoria
-Solo tú
-Purpose & context Dalsy works at the Banc de Recursos Mancomunats de Ciutat Vella (BRMCV), a community resource-sharing organization based at Carrer Tàpies, 6 in the Ciutat Vella district of Barcelona. The organization lends and delivers event equipment (tents, chairs, tables, sound systems, etc.) to local entities, managing an inventory of hundreds of items across multiple services (GREC, ESPORT3, APC, SANT LLUC, COOP57). The overarching goal is to modernize the organization's digital operations through two sequential phases: Internal management app (current focus) — a tool for workers to manage inventory, shifts, loan requests, and team communications Public-facing website improvement (subsequent phase) — improving recursosmancomunats.org (WordPress/WooCommerce/Elementor) Dalsy is positioned to serve as administrator of the technical accounts and infrastructure, with Claude handling technical configuration. The audience for internal tools includes colleagues with limited technical knowledge. All work and documentation is conducted in Catalan. --- Current state A React-based internal management app has been prototyped with five main sections: Resum – dashboard with stats and recent activity Inventari – catalog based on real items from recursosmancomunats.org Torns – weekly shift tracking (replacing a SharePoint Excel), with hours-worked vs. contracted comparison Pediments – entity loan requests Avisos – internal notice board (replacing WhatsApp for work communications) Oficina panel – CSV export of hours for payroll processing Serveis tab – editable cards per service with address, schedule, contact, materials, and notes The app is intended as a prototype to present to organizational leadership before full deployment. Key constraints established: Worker names do not appear in the app (use "Treballador 1, 2…" anonymization) Inventory reflects the real catalog from the website Microsoft Outlook/SharePoint integration was explored and dropped as too complex The solution must be entirely free: GitHub + Supabase + Vercel Supabase is reserved for exceptional cases (data recovery, CSV export); workers manage data directly from the app Claude has produced supporting PDF documentation in Catalan: a technical installation guide and two versions of an administrator guide (the second clarifying that Supabase is not for routine use). --- On the horizon Dalsy taking ownership of GitHub, Supabase, and Vercel accounts and deploying the app Presenting the prototype to BRMCV leadership for approval Phase 2: improving the public website (recursosmancomunats.org) — options previously identified include enhancing the WordPress setup with booking/form plugins, migrating to a purpose-built platform, or a full rebuild (e.g., Next.js + Supabase) A functional online request/reservation system for the website remains unbuilt (currently only PDFs and "Read more" buttons exist) --- Key learnings & principles The organization's existing pain points center on lack of real-time inventory visibility, overlapping order conflicts, and worker communication gaps (previously managed via SharePoint Excel and WhatsApp) Simpler, free-tier solutions are strongly preferred over technically complex integrations Documentation must be non-technical and accessible, clearly distinguishing what workers do vs. what the administrator does Earlier Microsoft 365-based approaches (Outlook calendar sharing, Airtable CSVs) were explored but superseded by the current React + Supabase stack PDF deliverables require clean, table-based layouts — previous versions with overlapping visual elements were flagged and corrected --- Tools & resources App stack: React (JSX), Supabase, Vercel, GitHub Current org tools: Microsoft 365 (Outlook, SharePoint), WordPress/WooCommerce/Elementor (public site) Reference site: recursosmancomunats.org Documentation: ReportLab (for PDF generation in Catalan)
-
-Última actualización 8 jun
-
-Instrucciones
-Agregar instrucciones para personalizar las respuestas de Claude
-
-Archivos
-
-brmcv-gestio.jsx
-782 líneas
-
-jsx
-
-
-brmcv-gestio.jsx
 import { useState, useEffect } from "react";
- 
+
 // ── WORKERS ───────────────────────────────────────────────────────────────────
 const WORKERS_DEF = [
   { id:"w1", nom:"Treballador 1", equip:"fix",   hores:35, rol:"treballador" },
@@ -61,10 +12,10 @@ const WORKERS_DEF = [
   { id:"of", nom:"Persona d'oficina", equip:"fix", hores:0, rol:"oficina" },
   { id:"adm",nom:"Dalsy (Admin)", equip:"fix",   hores:0,  rol:"admin" },
 ];
- 
+
 const LS_NAMES_KEY = "brmcv_worker_names";
 const LS_USER_KEY  = "brmcv_last_user";
- 
+
 // Returns saved custom names from localStorage, merged with defaults
 function loadNames() {
   try {
@@ -78,7 +29,7 @@ function saveNames(names) {
 function getWorkerNom(id, customNames) {
   return customNames[id] || WORKERS_DEF.find(w=>w.id===id)?.nom || id;
 }
- 
+
 // ── TORNS ─────────────────────────────────────────────────────────────────────
 const TORNS_DATA = {
   w1:[{e:"9:00",s:"15:00",srv:"GREC"},{e:"10:00",s:"12:00",srv:"GREC"},{e:"12:00",s:"15:00",srv:""},{e:"8:00",s:"13:00",srv:"GREC"},{e:"9:00",s:"15:00",srv:"GREC"}],
@@ -89,7 +40,7 @@ const TORNS_DATA = {
   w6:[{e:"7:00",s:"15:00",srv:"GREC"},{e:"",s:"",srv:""},{e:"7:00",s:"15:00",srv:""},{e:"7:00",s:"15:00",srv:""},{e:"7:00",s:"15:00",srv:""}],
   w7:[{e:"",s:"",srv:""},{e:"7:00",s:"15:00",srv:"GREC"},{e:"7:00",s:"15:00",srv:""},{e:"7:00",s:"15:00",srv:""},{e:"7:00",s:"15:00",srv:""}],
 };
- 
+
 // ── INVENTARI COMPLET (44 materials de recursosmancomunats.org) ───────────────
 const INV_INIT = [
   // Mobiliari
@@ -144,7 +95,7 @@ const INV_INIT = [
   {id:43, nom:"Audioguia",                             cat:"Altres",          total:5,  disp:5,  estat:"bo",          ubi:"Magatzem A",  notes:"Recàrrega USB"},
   {id:44, nom:"Bucle magnètic portàtil",               cat:"Altres",          total:1,  disp:1,  estat:"bo",          ubi:"Sala tècnica", notes:"Accessibilitat auditiva"},
 ];
- 
+
 // ── SERVEIS ───────────────────────────────────────────────────────────────────
 const SERVS_INIT = [
   {id:"GREC",     nom:"GREC",      color:"#2563eb", adresa:"Carrer dels Àngels, 2, El Raval",  horari:"Dl-Dv 8:00–16:00",  contacte:"coordinacio@grec.cat · 93 000 00 01",    materials:"20 cadires Garrotxa, 2 taules, equip de so petit", instruccions:"Accés per la porta lateral. Deixar les cadires a la sala polivalent.",notes:""},
@@ -153,19 +104,19 @@ const SERVS_INIT = [
   {id:"SANTLLUC", nom:"SANT LLUC", color:"#374151", adresa:"Carrer de Sant Lluc, 8",            horari:"Dj 9:00–14:00",      contacte:"santlluc@gmail.com · 93 000 00 04",       materials:"10 cadires, 1 taula plegable, catenàries",         instruccions:"Pujar al primer pis. Material al passadís.",notes:""},
   {id:"COOP57",   nom:"COOP57",    color:"#b91c1c", adresa:"Carrer de Premià, 15",              horari:"Dv 10:00–15:00",     contacte:"comunicacio@coop57.coop · 93 000 00 05", materials:"Pack 2000W, micròfon, 30 cadires, 5 taules",        instruccions:"Accés per la porta principal. Material al magatzem planta baixa.",notes:""},
 ];
- 
+
 const AVISOS_INIT = [
   {id:1,tipus:"ok",    text:"Servei GREC completat. 30 cadires retornades al magatzem.", autor:"Treballador 1",     servei:"GREC",    temps:"fa 2 hores"},
   {id:2,tipus:"warn",  text:"Dimmer Pack Eurolite en reparació fins dimarts.",           autor:"Persona d'oficina", servei:"General", temps:"ahir"},
   {id:3,tipus:"urgent",text:"Pack 2000W+SUB reservat fins el 20/06 — no cedir.",         autor:"Persona d'oficina", servei:"General", temps:"fa 1 dia"},
 ];
- 
+
 const BKGS_INIT = [
   {id:1,entitat:"Ass. Veïns El Raval",      material:"Cadira Garrotxa",qty:30,ini:"10/06",fi:"11/06",estat:"confirmada",contacte:"Maria G.",tel:"600 123 456"},
   {id:2,entitat:"Club Esportiu Gòtic",      material:"Carpa lleugera 3×3 m", qty:2, ini:"14/06",fi:"15/06",estat:"pendent",   contacte:"Jordi L.",tel:"611 234 567"},
   {id:3,entitat:"Biblioteca de les Coses",  material:"Taula plegable rectangular", qty:6, ini:"08/06",fi:"09/06",estat:"activa",    contacte:"Anna M.", tel:"622 345 678"},
 ];
- 
+
 const CATS = ["Totes","Mobiliari","Infraestructura","Equip de so","Equip de llums","Altres"];
 const avisColors = {ok:"#16a34a",warn:"#d97706",urgent:"#dc2626",info:"#2563eb"};
 const avisLabels = {ok:"Servei completat",warn:"Incidència",urgent:"Urgent",info:"Avís general"};
@@ -177,24 +128,24 @@ const calcH = torns => torns.reduce((a,t)=>{
   const[sh,sm]=t.s.split(":").map(Number);
   return a+(sh*60+sm-eh*60-em)/60;
 },0);
- 
+
 // Normalitza l'id del servei per cercar-lo (elimina espais)
 const normSrvId = s => s ? s.replace(/\s/g,"") : s;
- 
+
 const inputSt = {width:"100%",padding:"8px 10px",border:"1px solid #e5e7eb",borderRadius:8,fontSize:13,fontFamily:"inherit",color:"#1a1a1a",boxSizing:"border-box"};
 const labelSt = {fontSize:11,fontWeight:700,color:"#6b7280",textTransform:"uppercase",marginBottom:3,display:"block"};
- 
+
 // ── COMPONENTS ────────────────────────────────────────────────────────────────
 function Badge({estat}){
   const map={bo:{bg:"#dcfce7",c:"#15803d",l:"Bo"},manteniment:{bg:"#fef9c3",c:"#a16207",l:"Manteniment"},baixa:{bg:"#fee2e2",c:"#b91c1c",l:"Baixa"},confirmada:{bg:"#dbeafe",c:"#1d4ed8",l:"Confirmada"},pendent:{bg:"#fef9c3",c:"#a16207",l:"Pendent"},activa:{bg:"#dcfce7",c:"#15803d",l:"Activa"},completada:{bg:"#f3f4f6",c:"#6b7280",l:"Completada"}};
   const s=map[estat]||{bg:"#f3f4f6",c:"#374151",l:estat};
   return <span style={{background:s.bg,color:s.c,padding:"2px 9px",borderRadius:20,fontSize:11,fontWeight:700}}>{s.l}</span>;
 }
- 
+
 function Notif({msg,type}){
   return <div style={{position:"fixed",top:74,right:16,zIndex:999,background:type==="ok"?"#15803d":"#dc2626",color:"#fff",padding:"10px 16px",borderRadius:10,fontWeight:600,fontSize:13,boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>{type==="ok"?"✓ ":"⚠ "}{msg}</div>;
 }
- 
+
 function Modal({title,onClose,children}){
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -208,14 +159,14 @@ function Modal({title,onClose,children}){
     </div>
   );
 }
- 
+
 // ── WELCOME SCREEN ────────────────────────────────────────────────────────────
 // Cada usuari tria el seu perfil i, si és la primera vegada, introdueix el seu nom.
 function WelcomeScreen({onEnter, customNames, onSaveName}){
   const [sel, setSel]       = useState(null);
   const [step, setStep]     = useState("pick"); // "pick" | "name"
   const [nomInput, setNomInput] = useState("");
- 
+
   const handlePick = (w) => {
     setSel(w);
     const jaTeNom = !!customNames[w.id];
@@ -228,14 +179,14 @@ function WelcomeScreen({onEnter, customNames, onSaveName}){
       setStep("name");
     }
   };
- 
+
   const handleConfirmName = () => {
     const nom = nomInput.trim();
     if(!nom) return;
     onSaveName(sel.id, nom);
     onEnter({...sel, nom});
   };
- 
+
   if(step === "name" && sel){
     return(
       <div style={{minHeight:"100vh",background:"#f5f5f4",display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:"system-ui,-apple-system,sans-serif"}}>
@@ -271,7 +222,7 @@ function WelcomeScreen({onEnter, customNames, onSaveName}){
       </div>
     );
   }
- 
+
   return(
     <div style={{minHeight:"100vh",background:"#f5f5f4",display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:"system-ui,-apple-system,sans-serif"}}>
       <div style={{width:"100%",maxWidth:400}}>
@@ -299,18 +250,18 @@ function WelcomeScreen({onEnter, customNames, onSaveName}){
     </div>
   );
 }
- 
+
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App(){
   // Noms personalitzats (localStorage)
   const [customNames, setCustomNames] = useState(loadNames);
- 
+
   const saveName = (id, nom) => {
     const next = {...customNames, [id]: nom};
     setCustomNames(next);
     saveNames(next);
   };
- 
+
   const [user,setUser]       = useState(null);
   const [tab,setTab]         = useState("resum");
   const [inv,setInv]         = useState(INV_INIT);
@@ -332,15 +283,15 @@ export default function App(){
   // Modal per canviar noms (admin/oficina)
   const [showNoms, setShowNoms] = useState(false);
   const [nomsEdit, setNomsEdit] = useState({});
- 
+
   const notify = (msg,type="ok") => { setNotifState({msg,type}); setTimeout(()=>setNotifState(null),3000); };
   const canEdit = user?.rol==="oficina"||user?.rol==="admin";
- 
+
   // Funció per obtenir el nom mostrat d'un worker tenint en compte customNames
   const wNom = (id) => getWorkerNom(id, customNames);
- 
+
   if(!user) return <WelcomeScreen onEnter={u=>{setUser(u);setTab("resum");}} customNames={customNames} onSaveName={saveName}/>;
- 
+
   const tabs = [
     {id:"resum",    label:"Resum",     icon:"◈"},
     {id:"inventari",label:"Inventari", icon:"▦"},
@@ -350,19 +301,19 @@ export default function App(){
     {id:"avisos",   label:"Avisos",    icon:"✉"},
     ...(canEdit?[{id:"oficina",label:"Oficina",icon:"⊞"}]:[]),
   ];
- 
+
   const filtInv = inv.filter(i=>(catF==="Totes"||i.cat===catF)&&(!searchQ||i.nom.toLowerCase().includes(searchQ.toLowerCase())));
   const avail   = inv.reduce((a,i)=>a+i.disp,0);
   const total   = inv.reduce((a,i)=>a+i.total,0);
   const lowStock= inv.filter(i=>pct(i.disp,i.total)<=25).length;
   const actBkgs = bkgs.filter(b=>b.estat==="activa"||b.estat==="confirmada").length;
- 
+
   const sendAvis = () => {
     if(!avisIn.trim()) return;
     setAvisos(av=>[{id:Date.now(),tipus:avisTip,text:avisIn.trim(),autor:user.nom,servei:avisServ,temps:"ara mateix"},...av]);
     setAvisIn(""); notify("Avís enviat");
   };
- 
+
   const exportCSV = () => {
     const rows=[["Treballador","Equip","H. contractades","H. fetes","Diferència"],...WORKERS_DEF.filter(w=>w.rol==="treballador").map(w=>{
       const nomReal = wNom(w.id);
@@ -374,7 +325,7 @@ export default function App(){
     const a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="hores_setmana_brmcv.csv";a.click();
     notify("CSV descarregat — obre'l amb Excel");
   };
- 
+
   // Obre modal edició noms
   const openNoms = () => {
     const init = {};
@@ -392,11 +343,11 @@ export default function App(){
     setShowNoms(false);
     notify("Noms actualitzats");
   };
- 
+
   return(
     <div style={{minHeight:"100vh",background:"#f5f5f4",fontFamily:"system-ui,-apple-system,sans-serif"}}>
       <style>{`*{box-sizing:border-box;margin:0;padding:0} input,select,textarea{font-family:inherit} button{cursor:pointer} ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px} tr:hover td{background:#faf9f8!important} input:focus,select:focus,textarea:focus{outline:2px solid #C0392B;outline-offset:1px}`}</style>
- 
+
       {/* HEADER */}
       <header style={{background:"#C0392B",padding:"0 16px",display:"flex",alignItems:"center",gap:12,height:54,position:"sticky",top:0,zIndex:100}}>
         <div style={{width:30,height:30,background:"rgba(255,255,255,.2)",borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:15,color:"#fff",flexShrink:0}}>B</div>
@@ -411,7 +362,7 @@ export default function App(){
           <button onClick={()=>setUser(null)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:6,padding:"4px 8px",color:"rgba(255,255,255,.8)",fontSize:11}}>Canviar</button>
         </div>
       </header>
- 
+
       {/* NAV */}
       <nav style={{background:"#fff",borderBottom:"1px solid #e5e7eb",display:"flex",overflowX:"auto",padding:"0 8px"}}>
         {tabs.map(t=>(
@@ -421,11 +372,11 @@ export default function App(){
           </button>
         ))}
       </nav>
- 
+
       {notifState&&<Notif msg={notifState.msg} type={notifState.type}/>}
- 
+
       <main style={{maxWidth:1020,margin:"0 auto",padding:16}}>
- 
+
         {/* ── RESUM ── */}
         {tab==="resum"&&(
           <div>
@@ -465,7 +416,7 @@ export default function App(){
             </div>
           </div>
         )}
- 
+
         {/* ── INVENTARI ── */}
         {tab==="inventari"&&(
           <div>
@@ -506,7 +457,7 @@ export default function App(){
             </div>
           </div>
         )}
- 
+
         {/* ── TORNS ── */}
         {tab==="torns"&&(
           <div>
@@ -564,7 +515,7 @@ export default function App(){
             <p style={{fontSize:12,color:"#9ca3af",marginTop:8}}>La teva fila apareix ressaltada en blau. Clica el nom d'un servei (en vermell) per veure la fitxa completa.</p>
           </div>
         )}
- 
+
         {/* ── SERVEIS ── */}
         {tab==="serveis"&&(
           <div>
@@ -615,7 +566,7 @@ export default function App(){
             {!selServ&&<div style={{padding:24,textAlign:"center",color:"#9ca3af",fontSize:13,border:"1px dashed #e5e7eb",borderRadius:12}}>Selecciona un servei per veure la fitxa completa</div>}
           </div>
         )}
- 
+
         {/* ── PEDIMENTS ── */}
         {tab==="pediments"&&(
           <div>
@@ -644,7 +595,7 @@ export default function App(){
             </div>
           </div>
         )}
- 
+
         {/* ── AVISOS ── */}
         {tab==="avisos"&&(
           <div>
@@ -684,7 +635,7 @@ export default function App(){
             </div>
           </div>
         )}
- 
+
         {/* ── OFICINA ── */}
         {tab==="oficina"&&canEdit&&(
           <div>
@@ -744,9 +695,9 @@ export default function App(){
             </div>
           </div>
         )}
- 
+
       </main>
- 
+
       {/* MODAL INVENTARI */}
       {showAddInv&&(
         <Modal title={editInv?"Editar material":"Nou material"} onClose={()=>{setShowAddInv(false);setEditInv(null);}}>
@@ -773,7 +724,7 @@ export default function App(){
           </div>
         </Modal>
       )}
- 
+
       {/* MODAL PEDIMENT */}
       {showAddBkg&&(
         <Modal title="Nou pediment" onClose={()=>setShowAddBkg(false)}>
@@ -801,7 +752,7 @@ export default function App(){
           </div>
         </Modal>
       )}
- 
+
       {/* MODAL EDICIÓ DE NOMS (admin/oficina) */}
       {showNoms&&(
         <Modal title="Editar noms dels treballadors" onClose={()=>setShowNoms(false)}>
@@ -824,8 +775,7 @@ export default function App(){
           </button>
         </Modal>
       )}
- 
+
     </div>
   );
 }
- 
