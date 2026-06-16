@@ -249,4 +249,4 @@ function WelcomeScreen({onEnter, customNames, onSaveName}){
       </div>
     </div>
   );
-                     }
+}
