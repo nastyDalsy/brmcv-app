@@ -4,17 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPA_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-async function sb(path, opts={}) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
-    headers: {
-      "apikey": SUPA_KEY,
-      "Authorization": `Bearer ${SUPA_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": opts.prefer || "return=representation",
-      ...opts.headers,
-    },
-    ...opts,
-  });
+async function sb(path, method="GET", body=null, prefer="return=representation") {
+  const headers = {
+    "apikey": SUPA_KEY,
+    "Authorization": `Bearer ${SUPA_KEY}`,
+    "Content-Type": "application/json",
+    "Prefer": prefer,
+  };
+  const opts = { method, headers };
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, opts);
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Supabase error: ${err}`);
@@ -24,12 +23,11 @@ async function sb(path, opts={}) {
 }
 
 const db = {
-  get:    (table, qs="")      => sb(`${table}?${qs}`),
-  insert: (table, data)       => sb(table, { method:"POST", body:JSON.stringify(data) }),
-  update: (table, id, data)   => sb(`${table}?id=eq.${id}`, { method:"PATCH", body:JSON.stringify(data) }),
-  upsert: (table, data)       => sb(table, { method:"POST", body:JSON.stringify(data), prefer:"resolution=merge-duplicates,return=representation", headers:{"Prefer":"resolution=merge-duplicates,return=representation"} }),
-  delete: (table, id)         => sb(`${table}?id=eq.${id}`, { method:"DELETE", prefer:"" }),
-  deleteWhere: (table, col, val) => sb(`${table}?${col}=eq.${val}`, { method:"DELETE", prefer:"" }),
+  get:    (table, qs="")    => sb(qs ? `${table}?${qs}` : table, "GET"),
+  insert: (table, data)     => sb(table, "POST", data),
+  update: (table, id, data) => sb(`${table}?id=eq.${id}`, "PATCH", data),
+  upsert: (table, data)     => sb(table, "POST", data, "resolution=merge-duplicates,return=representation"),
+  delete: (table, id)       => sb(`${table}?id=eq.${id}`, "DELETE", null, ""),
 };
 
 // ── WORKERS ───────────────────────────────────────────────────────────────────
